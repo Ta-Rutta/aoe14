@@ -162,7 +162,8 @@ class Attack
 {
 public:
 
-	Player* player;
+	Player player;
+	double t = 0;
 
 	Array<double> time = Array<double>(100, 0);
 	Array<bool> timeStart = Array<bool>(100, false);
@@ -193,8 +194,7 @@ public:
 	RectF attack5_1 = returnRect(640, 310, 1000, 100);
 	RectF attack5_2 = returnRect(640, 410, 1000, 100);
 
-	Attack(Player* p)
-		:player{p}
+	Attack()
 	{
 		attack3_3.pieAsPolygon(75_deg, 30_deg);
 		tr3_3 = attack3_3.pieAsPolygon(75_deg, 30_deg);
@@ -203,112 +203,127 @@ public:
 		tr3_4 = attack3_4.pieAsPolygon(255_deg, 30_deg);  
     }
 
+	void checkRect(bool* b, RectF t) {
+		b = false;
+		if (Circle{ player.pos,20 }.intersects(t)) {
+			player.damage();
+		}
+	}
+
+	void checkCircle(bool* b, Circle c) {
+		b = false;
+		if (Circle{ player.pos,20 }.intersects(c)) {
+			player.damage();
+		}
+	}
+
 
 	void Action(int t) {
 
 		//攻撃判定追加
 		if (3 <= t && attackCheck[0]) {
 			attackCheck[0] = false;
-			if (Circle{ pos,20 }.intersects(attack1)) {
-				player->damage();
+			if (Circle{ player.pos,20 }.intersects(attack1)) {
+				player.damage();
 			}
+			//checkRect(&attackCheck[0], attack1);
 		}
 
 		if (4 <= t && attackCheck[1]) {
 			attackCheck[1] = false;
-			if (Circle{ pos,20 }.intersects(attack1_2)) {
-				player->damage();
+			if (Circle{ player.pos,20 }.intersects(attack1_2)) {
+				player.damage();
 			}
 		}
 
 		if (7 <= t && attackCheck[2]) {
 			attackCheck[2] = false;
-			if (Circle{ pos,20 }.intersects(attack2_1)) {
-				player_hp -= 1
+			if (Circle{ player.pos,20 }.intersects(attack2_1)) {
+				player.damage();
 			}
 		}
 
 		if (7.25 <= t && attackCheck[3]) {
 			attackCheck[3] = false;
-			if (Circle{ pos,20 }.intersects(attack2_2)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack2_2)) {
+				player.damage();
 			}
 		}
 
 		if (7.5 <= t && attackCheck[4]) {
 			attackCheck[4] = false;
-			if (Circle{ pos,20 }.intersects(attack2_3)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack2_3)) {
+				player.damage();
 			}
 		}
 
 		if (7.75 <= t && attackCheck[5]) {
 			attackCheck[5] = false;
-			if (Circle{ pos,20 }.intersects(attack2_4)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack2_4)) {
+				player.damage();
 			}
 		}
 
 		if (9 <= t && attackCheck[6]) {
 			attackCheck[6] = false;
-			if (Circle{ pos,20 }.intersects(attack2_5)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack2_5)) {
+				player.damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[7]) {
 			attackCheck[7] = false;
-			if (Circle{ pos,20 }.intersects(attack3_1)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack3_1)) {
+				player.damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[8]) {
 			attackCheck[8] = false;
-			if (Circle{ pos,20 }.intersects(attack3_2)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack3_2)) {
+				player.damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[9]) {
 			attackCheck[9] = false;
-			if (Circle{ pos,20 }.intersects(tr3_3)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(tr3_3)) {
+				player.damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[10]) {
 			attackCheck[10] = false;
-			if (Circle{ pos,20 }.intersects(tr3_4)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(tr3_4)) {
+				player.damage();
 			}
 		}
 
 		if (13 <= t && attackCheck[11]) {
 			attackCheck[11] = false;
-			if (Circle{ pos,20 }.intersects(attack4_1)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack4_1)) {
+				player.damage();
 			}
 		}
 
 		if (13 <= t && attackCheck[12]) {
 			attackCheck[12] = false;
-			if (Circle{ pos,20 }.intersects(attack4_2)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack4_2)) {
+				player.damage();
 			}
 		}
 
 		if (15.5 <= t && attackCheck[13]) {
 			attackCheck[13] = false;
-			if (Circle{ pos,20 }.intersects(attack5_1)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack5_1)) {
+				player.damage();
 			}
 		}
 
 		if (14 <= t && attackCheck[14]) {
 			attackCheck[14] = false;
-			if (Circle{ pos,20 }.intersects(attack5_2)) {
-				player_hp -= 1;
+			if (Circle{ player.pos,20 }.intersects(attack5_2)) {
+				player.damage();
 			}
 		}
 
@@ -316,7 +331,10 @@ public:
 
 	}
 
-	void update()
+	void update() {
+		const double deltaTime = Scene::DeltaTime();
+		t += deltaTime;
+	}
 
 
 };
