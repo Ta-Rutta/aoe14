@@ -117,6 +117,8 @@ Circle returnCircle(int x, int y, int r) {
 	return Circle{ Arg::center(x, y) ,r};
 }
 
+
+
 class Player {
 private:	
 	int hp = 3;
@@ -124,7 +126,7 @@ private:
 	double t = 0;
 public:	
 	Vec2 pos{ 640,360 };
-	bool move = false;
+	bool move = true;
 
 	void update() {
 		const double deltaTime = Scene::DeltaTime();
@@ -161,6 +163,62 @@ public:
 	int returnHP() {
 		return hp;
 	}
+
+	Vec2 returnPos() {
+		return pos;
+	}
+
+	void stop() {
+		move = false;
+	}
+};
+
+
+class Enemy {
+private:
+	int hp = 10000;
+	int r = 10;
+	double t = 0;
+public:
+	Vec2 pos{ 640,360 };
+	bool move = true;
+	Player* player;
+	double distance = 0;
+
+	Enemy(Player* p)
+		: player{ p }
+	{
+
+	}
+
+	void update() {
+		const double deltaTime = Scene::DeltaTime();
+		t += deltaTime;
+
+		distance = (pos.x - player->pos.x) * (pos.x - player->pos.x) + (pos.y - player->pos.y) * (pos.y - player->pos.y);
+
+		if (distance > 1225) {
+			if (pos.x < player->pos.x) {
+				pos.x += Scene::DeltaTime() * 125;
+			}
+			if (pos.x > player->pos.x) {
+				pos.x -= Scene::DeltaTime() * 125;
+			}
+			if (pos.y < player->pos.y) {
+				pos.y += Scene::DeltaTime() * 125;
+			}
+			if (pos.y > player->pos.y) {
+				pos.y -= Scene::DeltaTime() * 125;
+			}
+		}
+	}
+
+	void draw()const {
+		Circle{ pos,r }.draw();
+	}
+
+
+
 };
 
 
@@ -170,6 +228,7 @@ public:
 
 	Player* player;
 	double t = 0;
+	bool keepTime = false;
 
 	Array<double> time = Array<double>(100, 0);
 	Array<bool> timeStart = Array<bool>(100, false);
@@ -218,14 +277,14 @@ public:
 
 	void checkRect(bool& b, RectF t) {
 		b = false;
-		if (Circle{ player->pos,20 }.intersects(t)) {
+		if (Circle{ player->returnPos(),20}.intersects(t)) {
 			player->damage();
 		}
 	}
 
 	void checkCircle(bool& b, Circle c) {
 		b = false;
-		if (Circle{ player->pos,20 }.intersects(c)) {
+		if (Circle{ player->returnPos(),20 }.intersects(c)) {
 			player->damage();
 		}
 	}
@@ -239,7 +298,7 @@ public:
 		//攻撃判定追加
 		if (3 <= t && attackCheck[0]) {
 			attackCheck[0] = false;
-			if (Circle{ player->pos,20 }.intersects(attack1)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack1)) {
 				player->damage();
 			}
 			//checkRect(attackCheck[0], attack1);
@@ -247,98 +306,98 @@ public:
 
 		if (4 <= t && attackCheck[1]) {
 			attackCheck[1] = false;
-			if (Circle{ player->pos,20 }.intersects(attack1_2)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack1_2)) {
 				player->damage();
 			}
 		}
 
 		if (7 <= t && attackCheck[2]) {
 			attackCheck[2] = false;
-			if (Circle{ player->pos,20 }.intersects(attack2_1)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack2_1)) {
 				player->damage();
 			}
 		}
 
 		if (7.25 <= t && attackCheck[3]) {
 			attackCheck[3] = false;
-			if (Circle{ player->pos,20 }.intersects(attack2_2)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack2_2)) {
 				player->damage();
 			}
 		}
 
 		if (7.5 <= t && attackCheck[4]) {
 			attackCheck[4] = false;
-			if (Circle{ player->pos,20 }.intersects(attack2_3)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack2_3)) {
 				player->damage();
 			}
 		}
 
 		if (7.75 <= t && attackCheck[5]) {
 			attackCheck[5] = false;
-			if (Circle{ player->pos,20 }.intersects(attack2_4)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack2_4)) {
 				player->damage();
 			}
 		}
 
 		if (9 <= t && attackCheck[6]) {
 			attackCheck[6] = false;
-			if (Circle{ player->pos,20 }.intersects(attack2_5)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack2_5)) {
 				player->damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[7]) {
 			attackCheck[7] = false;
-			if (Circle{ player->pos,20 }.intersects(attack3_1)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack3_1)) {
 				player->damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[8]) {
 			attackCheck[8] = false;
-			if (Circle{ player->pos,20 }.intersects(attack3_2)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack3_2)) {
 				player->damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[9]) {
 			attackCheck[9] = false;
-			if (Circle{ player->pos,20 }.intersects(tr3_3)) {
+			if (Circle{ player->returnPos(),20 }.intersects(tr3_3)) {
 				player->damage();
 			}
 		}
 
 		if (12 <= t && attackCheck[10]) {
 			attackCheck[10] = false;
-			if (Circle{ player->pos,20 }.intersects(tr3_4)) {
+			if (Circle{ player->returnPos(),20 }.intersects(tr3_4)) {
 				player->damage();
 			}
 		}
 
 		if (13 <= t && attackCheck[11]) {
 			attackCheck[11] = false;
-			if (Circle{ player->pos,20 }.intersects(attack4_1)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack4_1)) {
 				player->damage();
 			}
 		}
 
 		if (13 <= t && attackCheck[12]) {
 			attackCheck[12] = false;
-			if (Circle{ player->pos,20 }.intersects(attack4_2)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack4_2)) {
 				player->damage();
 			}
 		}
 
 		if (15.5 <= t && attackCheck[13]) {
 			attackCheck[13] = false;
-			if (Circle{ player->pos,20 }.intersects(attack5_1)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack5_1)) {
 				player->damage();
 			}
 		}
 
-		if (14 <= t && attackCheck[14]) {
+		if (15.5 <= t && attackCheck[14]) {
 			attackCheck[14] = false;
-			if (Circle{ player->pos,20 }.intersects(attack5_2)) {
+			if (Circle{ player->returnPos(),20 }.intersects(attack5_2)) {
 				player->damage();
 			}
 		}		
@@ -368,9 +427,17 @@ public:
 		
 	}
 
+	int returnT() {
+		return t;
+	}
+
+
+
 	void update() {
 		const double deltaTime = Scene::DeltaTime();
-		t += deltaTime;
+		if (!keepTime) {			
+			t += deltaTime;
+		}
 
 		for (int k = 0; k < 10; k++) {
 			if (timeStart[k] == true) {
@@ -449,6 +516,9 @@ public:
 			if (KeyEnter.down()) {
 				changeScene(U"Battle", 0.5s);
 			}
+			if (KeySpace.down()) {
+				changeScene(U"debug", 0.5s);
+			}
 	}
 
 	void draw()const override {
@@ -472,10 +542,10 @@ public:
 
 	Player* player = new Player();
 	Attack attack{ player };
-	
+	Enemy enemy{ player };
 
 	Ellipse field{ 640, 360, 500, 300 };
-	Vec2 pos{ 640, 360 };
+	Vec2 UIpos{ 640, 360 };
 	Vec2 check;
 	Vec2 bar;
 
@@ -486,7 +556,7 @@ public:
 	
 	static constexpr int r = 5;
 
-	Camera2D camera{ pos, 1.0, CameraControl::None_ };
+	Camera2D camera{ UIpos, 1.0, CameraControl::None_ };
 	bool move = true;
 	bool end = false;
 	bool win = false;
@@ -518,6 +588,8 @@ public:
 
 
 	void update()override {
+		UIpos.x = player->pos.x;
+		UIpos.y = player->pos.y;
 
 		hp = player->returnHP();
 
@@ -528,44 +600,22 @@ public:
 
 		
 		camera.update();
-		camera.setTargetCenter(pos);
+		camera.setTargetCenter(UIpos);
 		
 
-		bar.x = pos.x-32;
-		bar.y = pos.y - 75;
+		bar.x = player->pos.x-32;
+		bar.y = player->pos.y - 75;
 
+		player->update();
 		attack.update();
-
-		
-
-		if (move == true) {
-			if (KeyRight.pressed()) {
-				pos.x += Scene::DeltaTime() * 150;
-			}
-			if (KeyLeft.pressed()) {
-				pos.x -= Scene::DeltaTime() * 150;
-			}
-			if (KeyUp.pressed()) {
-				pos.y -= Scene::DeltaTime() * 150;
-			}
-			if (KeyDown.pressed()) {
-				pos.y += Scene::DeltaTime() * 150;
-			}
-		}
-
-			
-
-		if (Circle{ pos,20 }.intersects(field)) {
-
-		}
-		
+		enemy.update();
 		
 
 		if (t >= 16) {
 			win = true;
 		}
 
-		if (!(Circle{ pos,20 }.intersects(field))) {									
+		if (!(Circle{ player->pos,20 }.intersects(field))) {									
 			hp = 0;
 		}
 
@@ -577,6 +627,7 @@ public:
 		}
 
 		if (end == true) {
+			player->stop();
 			if (KeyEnter.down()) {
 				changeScene(U"Battle", 0.5s);
 			}
@@ -585,6 +636,7 @@ public:
 		if (win == true) {
 			move = false;
 			t = 0;
+			player->stop();
 			if (KeyEnter.down()) {
 				changeScene(U"Battle", 0.5s);
 			}
@@ -597,33 +649,56 @@ public:
 			const auto te = camera.createTransformer();
 
 			field.draw(Color{ 139,69,19 });
-			Circle player{ pos,r };
 
+			player->draw();
 			attack.draw();
-			
+			enemy.draw();
+
 			//hpバー
-			RectF{ pos.x - 30,pos.y - 45,60,20 }.draw(ColorF(1,1,1)).drawFrame(3);
-			RectF{ pos.x - 30,pos.y - 45,hp * 20,20 }.draw(ColorF(0, 1, 0));
-			player.draw(Color{ 1,0,0 });
+			RectF{ player->pos.x - 30,player->pos.y - 45,60,20 }.draw(ColorF(1,1,1)).drawFrame(3);
+			RectF{ player->pos.x - 30,player->pos.y - 45,hp * 20,20 }.draw(ColorF(0, 1, 0));
 		
 		
 		if (end) {			
 			Rect(-500, -500, 3000, 3000).draw(ColorF{ 0,0,0,0.7 });
-			font(U"YOU DIED").draw(80,pos.x-200,pos.y-60, ColorF(1, 1, 1));
-			font(U"Enterキーでリスタート").draw(50, pos.x - 250, pos.y+40, ColorF(1, 1, 1));
+			font(U"YOU DIED").draw(80, player->pos.x-200, player->pos.y-60, ColorF(1, 1, 1));
+			font(U"Enterキーでリスタート").draw(50, player->pos.x - 250, player->pos.y+40, ColorF(1, 1, 1));
 			
 		}
 
 		if (win) {
 			Rect(-500, -500, 3000, 3000).draw(ColorF{ 0,0,0.3,0.7 });
-			font(U"YOU WIN!").draw(80, pos.x - 200, pos.y - 60, ColorF(1, 1, 1));
-			font(U"Enterキーでリスタート").draw(50, pos.x - 250, pos.y + 40, ColorF(1, 1, 1));
+			font(U"YOU WIN!").draw(80, player->pos.x - 200, player->pos.y - 60, ColorF(1, 1, 1));
+			font(U"Enterキーでリスタート").draw(50, player->pos.x - 250, player->pos.y + 40, ColorF(1, 1, 1));
 		}
 		
 	}
 };
 
 
+class debug : public App::Scene
+{
+public:
+
+	Player* player = new Player();
+	Enemy enemy{ player };
+
+	debug(const InitData& init)
+		: IScene{ init }
+	{
+		Scene::SetBackground(Palette::Black);
+	}
+	
+	void update()override {
+		player->update();
+		enemy.update();
+	}
+
+	void draw()const override {
+		player->draw();
+		enemy.draw();
+	}
+};
 void Main()
 {
 	Window::Resize(1280, 720);
@@ -632,6 +707,7 @@ void Main()
 
 	manager.add<title>(U"title");
 	manager.add<Battle>(U"Battle");
+	manager.add<debug>(U"debug");
 
 	while (System::Update())
 	{
@@ -642,193 +718,3 @@ void Main()
 		}
 	}
 }
-
-
-
-////攻撃判定追加
-//if (3 <= t && attackCheck[0]) {
-//	attackCheck[0] = false;
-//	if (Circle{ pos,20 }.intersects(attack1)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (4 <= t && attackCheck[1]) {
-//	attackCheck[1] = false;
-//	if (Circle{ pos,20 }.intersects(attack1_2)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (7 <= t && attackCheck[2]) {
-//	attackCheck[2] = false;
-//	if (Circle{ pos,20 }.intersects(attack2_1)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (7.25 <= t && attackCheck[3]) {
-//	attackCheck[3] = false;
-//	if (Circle{ pos,20 }.intersects(attack2_2)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (7.5 <= t && attackCheck[4]) {
-//	attackCheck[4] = false;
-//	if (Circle{ pos,20 }.intersects(attack2_3)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (7.75 <= t && attackCheck[5]) {
-//	attackCheck[5] = false;
-//	if (Circle{ pos,20 }.intersects(attack2_4)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (9 <= t && attackCheck[6]) {
-//	attackCheck[6] = false;
-//	if (Circle{ pos,20 }.intersects(attack2_5)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (12 <= t && attackCheck[7]) {
-//	attackCheck[7] = false;
-//	if (Circle{ pos,20 }.intersects(attack3_1)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (12 <= t && attackCheck[8]) {
-//	attackCheck[8] = false;
-//	if (Circle{ pos,20 }.intersects(attack3_2)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (12 <= t && attackCheck[9]) {
-//	attackCheck[9] = false;
-//	if (Circle{ pos,20 }.intersects(tr3_3)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (12 <= t && attackCheck[10]) {
-//	attackCheck[10] = false;
-//	if (Circle{ pos,20 }.intersects(tr3_4)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (13 <= t && attackCheck[11]) {
-//	attackCheck[11] = false;
-//	if (Circle{ pos,20 }.intersects(attack4_1)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (13 <= t && attackCheck[12]) {
-//	attackCheck[12] = false;
-//	if (Circle{ pos,20 }.intersects(attack4_2)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (15.5 <= t && attackCheck[13]) {
-//	attackCheck[13] = false;
-//	if (Circle{ pos,20 }.intersects(attack5_1)) {
-//		player_hp -= 1;
-//	}
-//}
-
-//if (14 <= t && attackCheck[14]) {
-//	attackCheck[14] = false;
-//	if (Circle{ pos,20 }.intersects(attack5_2)) {
-//		player_hp -= 1;
-//	}
-//}
-
-
-////攻撃描画追加
-			//if (0 < t && t < 3) {
-			//	//drawRect(890, 360, time[0],500,600);
-			//	drawDonut(pos.x, pos.y, time[0], 300, 200);
-			//}
-
-			//if (1 < t && t < 4) {
-			//	drawRect(390, 360, time[1], 500, 600);							
-			//}
-
-			//if (4 < t && t < 7) {
-			//	drawCircle(890, 210, time[2], 250);
-			//}
-
-			//if (4.25 < t && t < 7.25) {
-			//	drawCircle(390, 210, time[3], 250);
-			//}
-
-			//if (4.5 < t && t < 7.5) {
-			//	drawCircle(390,510, time[4], 250);
-			//}
-
-			//if (4.75 < t && t < 7.75) {
-			//	drawCircle(890, 510, time[5], 250);
-			//}
-			//if (6 < t && t < 9) {
-			//	drawCircle(640, 360, time[6], 250);
-			//}
-			//if (9 < t && t < 12) {
-			//	drawRect(640, 110, time[7], 1000, 100);
-			//	drawRect(640, 610, time[7], 1000, 100);
-			//	drawBlethRight(140, 360, time[7], 1000);
-			//	drawBlethLeght(1140, 360, time[7], 1000);
-			//}
-			//if (10 < t && t < 13) {
-			//	drawRect(640, 210, time[8], 1000, 100);
-			//	drawRect(640, 510, time[8], 1000, 100);
-			//}
-			//if (12.5 < t && t < 15.5) {
-			//	drawRect(640, 310, time[9], 1000, 100);
-			//	drawRect(640, 410, time[9], 1000, 100);
-			//}
-			//
-
-
-////時間追加
-		//if (0 < t && t < 3) {
-		//	reBool(timeStart[0]);
-		//}
-		//if (1 < t && t < 4) {
-		//	reBool(timeStart[1]);
-		//}
-		//if (4 < t && t < 7) {
-		//	reBool(timeStart[2]);
-		//}
-		//if (4.25 < t && t < 7.25) {
-		//	reBool(timeStart[3]);
-		//}
-
-		//if (4.5 < t && t < 7.5) {
-		//	reBool(timeStart[4]);
-		//}
-
-		//if (4.75 < t && t < 7.75) {
-		//	reBool(timeStart[5]);
-		//}
-
-		//if (6 < t && t < 9) {
-		//	reBool(timeStart[6]);
-		//}
-
-		//if (9 < t && t < 12) {
-		//	reBool(timeStart[7]); 
-		//}
-		//if (10 < t && t < 13) {
-		//	reBool(timeStart[8]); 
-		//}
-		//if (12.5 < t && t < 15.5) {
-		//	reBool(timeStart[9]);
-		//}
