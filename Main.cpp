@@ -145,6 +145,9 @@ public:
 			if (KeyDown.pressed()) {
 				pos.y += Scene::DeltaTime() * 150;
 			}
+			/*if (KeyRight.pressed() && KeyUp.pressed()) {
+
+			}*/
 		}
 	}
 
@@ -184,40 +187,34 @@ public:
 	bool move = true;
 	Player* player;
 	double distance = 0;
+	Vec2 velocity{ 0, 0 };
+	//Vec2 target=pos;
 
 	Enemy(Player* p)
 		: player{ p }
 	{
 
 	}
-
+	 
 	void update() {
-		const double deltaTime = Scene::DeltaTime();
-		t += deltaTime;
+		/*const double deltaTime = Scene::DeltaTime();
+		t += deltaTime;*/
+		//if (pos.x >= player->pos.x + 35)target = { player->pos.x + 35 ,player->pos.y };
 
 		distance = (pos.x - player->pos.x) * (pos.x - player->pos.x) + (pos.y - player->pos.y) * (pos.y - player->pos.y);
 
-		if (distance > 1225) {
-			if (pos.x < player->pos.x) {
-				pos.x += Scene::DeltaTime() * 125;
-			}
-			if (pos.x > player->pos.x) {
-				pos.x -= Scene::DeltaTime() * 125;
-			}
-			if (pos.y < player->pos.y) {
-				pos.y += Scene::DeltaTime() * 125;
-			}
-			if (pos.y > player->pos.y) {
-				pos.y -= Scene::DeltaTime() * 125;
-			}
-		}
+		pos = Math::SmoothDamp(pos, target(pos,player->pos,35), velocity, 0.5);
+		
 	}
 
 	void draw()const {
 		Circle{ pos,r }.draw();
 	}
 
-
+	Vec2 target(const Vec2& startPos, const Vec2& targetPos, double length)
+	{
+		return targetPos + (startPos - targetPos).setLength(length);
+	}
 
 };
 
