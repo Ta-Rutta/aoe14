@@ -2,6 +2,7 @@
 
 using App = SceneManager<String>;//using=省略
 bool once = true;
+enum class EntityState { playerSide, enemySide };//シーン管理{0,1}
 
 ColorF changeColor(double t, double limit) {
 	
@@ -117,20 +118,40 @@ Circle returnCircle(int x, int y, int r) {
 	return Circle{ Arg::center(x, y) ,r};
 }
 
+class Entity {
+public:
+	int hp;
+	int r;
+	double t;
+	EntityState state;
+	Circle area;
+
+	virtual void update() = 0;
+	virtual void draw()const = 0;
 
 
-class Player {
-private:	
-	int hp = 3;
-	int r = 5;
-	double t = 0;
+};
+
+
+
+class Player : Entity {
 public:	
 	Vec2 pos{ 640,360 };
 	bool move = true;
 
+	Player()		
+	{
+		hp = 10000;
+		r = 5;
+		t = 0;
+		EntityState playerSide;		
+	}
+
+
 	void update() {
 		const double deltaTime = Scene::DeltaTime();
 		t += deltaTime;
+		area = { pos,r };
 
 		if (move == true) {
 			if (KeyRight.pressed()) {
@@ -151,8 +172,8 @@ public:
 		}
 	}
 
-	void draw() {
-		Circle{ pos,r }.draw();
+	void draw()const {
+		area.draw();
 	}
 
 	Circle returnEria() {
@@ -177,11 +198,7 @@ public:
 };
 
 
-class Enemy {
-private:
-	int hp = 10000;
-	int r = 10;
-	double t = 0;
+class Enemy :Entity {
 public:
 	Vec2 pos{ 640,360 };
 	bool move = true;
@@ -193,18 +210,19 @@ public:
 	Enemy(Player* p)
 		: player{ p }
 	{
-
+		hp = 10000;
+		r = 10;
+		t = 0;
+		EntityState enemySide;
 	}
-	 
+
 	void update() {
 		/*const double deltaTime = Scene::DeltaTime();
 		t += deltaTime;*/
-		//if (pos.x >= player->pos.x + 35)target = { player->pos.x + 35 ,player->pos.y };
 
-		distance = (pos.x - player->pos.x) * (pos.x - player->pos.x) + (pos.y - player->pos.y) * (pos.y - player->pos.y);
 
-		pos = Math::SmoothDamp(pos, target(pos,player->pos,35), velocity, 0.5);
-		
+		pos = Math::SmoothDamp(pos, target(pos, player->pos, 35), velocity, 0.2);//敵の追従スピード0.2が最適
+
 	}
 
 	void draw()const {
@@ -493,6 +511,38 @@ public:
 
 	}
 
+
+};
+
+
+class EntityManager{
+public:
+
+	Array<std::unique_ptr<Entity>>entitys;
+	HashTable<EntityState, Array<Entity*>>entityTable;
+    
+	void add(Entity* entity)//配列につっこむ
+	{
+		entitys.push_back(std::unique_ptr<Entity>(entity));
+		entityTable[entity->state].push_back(entity);
+	}
+
+	Array<Entity*> get(EntityState state)//配列なかみ取り出し
+	{
+		if (entityTable.contains(state))
+		{
+			return entityTable[state];
+		}
+
+		return Array<Entity*>{};
+	}
+
+	void update()
+	{
+		for (auto& entity : entitys) {
+			entity->update();
+		}
+	}
 
 };
 
