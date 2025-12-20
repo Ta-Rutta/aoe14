@@ -125,18 +125,20 @@ public:
 	double t;
 	EntityState state;
 	Circle area;
+	Vec2 pos;
+	Entity* target;
 
-	virtual void update() = 0;
+	virtual void update() = 0;		
 	virtual void draw()const = 0;
-
+	virtual Circle returnEria() = 0;
+	virtual void setTarget(Entity* target) = 0;
 
 };
 
 
 
-class Player : Entity {
+class Player : public Entity {
 public:	
-	Vec2 pos{ 640,360 };
 	bool move = true;
 
 	Player()		
@@ -144,7 +146,8 @@ public:
 		hp = 10000;
 		r = 5;
 		t = 0;
-		EntityState playerSide;		
+		EntityState playerSide;
+		pos = { 640,360 };
 	}
 
 
@@ -195,12 +198,15 @@ public:
 	void stop() {
 		move = false;
 	}
+
+	void setTarget(Entity* Target) {
+		target = Target;
+	}
 };
 
 
-class Enemy :Entity {
+class Enemy :public Entity {
 public:
-	Vec2 pos{ 640,360 };
 	bool move = true;
 	Player* player;
 	double distance = 0;
@@ -213,25 +219,36 @@ public:
 		hp = 10000;
 		r = 10;
 		t = 0;
+		pos={ 640,360 };
 		EntityState enemySide;
 	}
 
-	void update() {
-		/*const double deltaTime = Scene::DeltaTime();
-		t += deltaTime;*/
+	void update() {		
 
+		pos = Math::SmoothDamp(pos, toTarget(pos, player->pos, 35), velocity, 0.2);//敵の追従スピード0.2が最適
 
-		pos = Math::SmoothDamp(pos, target(pos, player->pos, 35), velocity, 0.2);//敵の追従スピード0.2が最適
+	}
 
+	void drawTargeted()const {
+		Circle{ pos,r + 15 }.drawFrame(5, 0, ColorF(1, 0, 0, 1));
 	}
 
 	void draw()const {
 		Circle{ pos,r }.draw();
+		drawTargeted();		
 	}
 
-	Vec2 target(const Vec2& startPos, const Vec2& targetPos, double length)
+	Vec2 toTarget(const Vec2& startPos, const Vec2& targetPos, double length)
 	{
 		return targetPos + (startPos - targetPos).setLength(length);
+	}
+
+	Circle returnEria() {
+		return Circle{ pos,r };
+	}
+
+	void setTarget(Entity* Target) {
+		target = Target;
 	}
 
 };
@@ -518,6 +535,7 @@ public:
 class EntityManager{
 public:
 
+	Entity* player;
 	Array<std::unique_ptr<Entity>>entitys;
 	HashTable<EntityState, Array<Entity*>>entityTable;
     
@@ -526,6 +544,7 @@ public:
 		entitys.push_back(std::unique_ptr<Entity>(entity));
 		entityTable[entity->state].push_back(entity);
 	}
+
 
 	Array<Entity*> get(EntityState state)//配列なかみ取り出し
 	{
@@ -541,6 +560,9 @@ public:
 	{
 		for (auto& entity : entitys) {
 			entity->update();
+			if (entity->returnEria().leftClicked()) {
+				entitys[0]->setTarget(entity);
+			}
 		}
 	}
 
@@ -746,6 +768,7 @@ public:
 		enemy.draw();
 	}
 };
+
 void Main()
 {
 	Window::Resize(1280, 720);
